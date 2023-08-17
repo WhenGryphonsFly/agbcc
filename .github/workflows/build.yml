@@ -5,13 +5,46 @@ on:
     branches: [ master ]
   pull_request:
 
+env:
+  IS_DEPLOY: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+
       - name: Checkout
         uses: actions/checkout@master
+
       - name: Install deps
-        run: sudo apt install gcc-arm-none-eabi binutils-arm-none-eabi
+        run: |
+          sudo apt update
+          sudo apt install gcc-arm-none-eabi binutils-arm-none-eabi
+
       - name: Compile
         run: sh build.sh
+
+      - name: Install to temp dir
+        shell: bash
+        run: sh install.sh TEMPDIR
+
+      - name: Create release archive
+        shell: bash
+        run: tar -C TEMPDIR/tools/agbcc -czf agbcc.tar.gz bin include lib
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v2
+        if: ${{ env.IS_DEPLOY }}
+        with:
+          name: agbcc.tar.gz
+          path: agbcc.tar.gz
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ env.IS_DEPLOY }}
+    steps:
+      - name: Update release
+        uses: johnwbyrd/update-release@v1.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }} # Automatically created by the workflow with a lifetime of one hour
+          files: agbcc.tar.gz
