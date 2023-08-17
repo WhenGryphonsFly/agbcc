@@ -5,6 +5,8 @@ on:
     branches: [ master ]
   pull_request:
 
+# Note, Github Actions is dumb and only steps - not jobs - can access env.
+# Therefore, if you update this, make sure to update the deploy job below.
 env:
   IS_DEPLOY: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
 
@@ -24,11 +26,14 @@ jobs:
       - name: Compile
         run: sh build.sh
 
+      # No point in running the following steps if we are not deploying
       - name: Install to temp dir
+        if: ${{ env.IS_DEPLOY }}
         shell: bash
         run: sh install.sh TEMPDIR
 
       - name: Create release archive
+       if: ${{ env.IS_DEPLOY }}
         shell: bash
         run: tar -C TEMPDIR/tools/agbcc -czf agbcc.tar.gz bin include lib
 
@@ -41,7 +46,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ env.IS_DEPLOY }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     steps:
       - name: Update release
         uses: johnwbyrd/update-release@v1.0.0
