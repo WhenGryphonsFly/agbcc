@@ -9,18 +9,12 @@ on:
 # Therefore, if you update this, make sure to update the deploy job below.
 env:
   IS_DEPLOY: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-  SHORT_HASH: ${{ $GITHUB_SHA | cut -c1-8 }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Echo
-        run: echo ${{ SHORT_HASH }}
-        
-      - name: Fail
-        uses: cutenode/action-always-fail@v1.0.0
-        
+
       - name: Checkout
         uses: actions/checkout@main
 
@@ -63,6 +57,6 @@ jobs:
         with:
           artifactErrorsFailBuild: true
           artifacts: agbcc.tar.gz
-          commit: env.SHORT_HASH
-          tag: env.SHORT_HASH
+          commit: github.sha
+          tag: github.sha
           token: ${{ secrets.GITHUB_TOKEN }} # Automatically created by the workflow with a lifetime of one hour
