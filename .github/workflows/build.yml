@@ -16,7 +16,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@main
 
       - name: Install deps
         run: |
@@ -40,7 +40,7 @@ jobs:
         run: tar -C TEMPDIR/tools/agbcc -czf agbcc.tar.gz bin include lib
 
       - name: Upload archive
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@main
         if: env.IS_DEPLOY
         with:
           name: agbcc.tar.gz
