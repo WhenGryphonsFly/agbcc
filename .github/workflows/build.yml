@@ -33,7 +33,7 @@ jobs:
         run: sh install.sh TEMPDIR
 
       - name: Create release archive
-       if: ${{ env.IS_DEPLOY }}
+        if: ${{ env.IS_DEPLOY }}
         shell: bash
         run: tar -C TEMPDIR/tools/agbcc -czf agbcc.tar.gz bin include lib
 
