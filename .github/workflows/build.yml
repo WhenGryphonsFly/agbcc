@@ -28,18 +28,18 @@ jobs:
 
       # No point in running the following steps if we are not deploying
       - name: Install to temp dir
-        if: ${{ env.IS_DEPLOY }}
+        if: env.IS_DEPLOY
         shell: bash
         run: sh install.sh TEMPDIR
 
       - name: Create release archive
-        if: ${{ env.IS_DEPLOY }}
+        if: env.IS_DEPLOY
         shell: bash
         run: tar -C TEMPDIR/tools/agbcc -czf agbcc.tar.gz bin include lib
 
       - name: Upload archive
         uses: actions/upload-artifact@v2
-        if: ${{ env.IS_DEPLOY }}
+        if: env.IS_DEPLOY
         with:
           name: agbcc.tar.gz
           path: agbcc.tar.gz
