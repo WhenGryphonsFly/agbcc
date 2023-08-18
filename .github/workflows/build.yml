@@ -30,7 +30,9 @@ jobs:
       - name: Install to temp dir
         if: env.IS_DEPLOY
         shell: bash
-        run: sh install.sh TEMPDIR
+        run: |
+          mkdir TEMPDIR
+          sh install.sh TEMPDIR
 
       - name: Create release archive
         if: env.IS_DEPLOY
